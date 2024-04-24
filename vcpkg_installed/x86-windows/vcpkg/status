@@ -1,0 +1,62 @@
+Package: vcpkg-cmake-config
+Version: 2022-02-06
+Port-Version: 1
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 159fe47f2e6bb7443bf073d17cad5d18f0f5bd997def1f652477e44a0908ff12
+Status: install ok installed
+
+Package: vcpkg-cmake
+Version: 2023-05-04
+Architecture: x64-windows
+Multi-Arch: same
+Abi: ae74e552db5a47efdbcdeaefb1c3bda7f4545b83e3af808fd7947450651f5ad5
+Status: install ok installed
+
+Package: glfw3
+Version: 3.3.8
+Port-Version: 2
+Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
+Architecture: x86-windows
+Multi-Arch: same
+Abi: fa1a396eae1642bec69adea3d5ab68569863fe1ab714b089c287b55aac5f251a
+Description: GLFW is a free, Open Source, multi-platform library for OpenGL, OpenGL ES and Vulkan application development. It provides a simple, platform-independent API for creating windows, contexts and surfaces, reading input, handling events, etc.
+Status: install ok installed
+
+Package: lua
+Version: 5.4.6
+Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
+Architecture: x86-windows
+Multi-Arch: same
+Abi: a60e9e38813a1c175633fe77b015b6a946a6cd19f909610f7b2dd776b7dd2eba
+Description: A powerful, fast, lightweight, embeddable scripting language
+Status: install ok installed
+
+Package: egl-registry
+Version: 2022-09-20
+Architecture: x86-windows
+Multi-Arch: same
+Abi: 6f50295c3e5087e08b0471e971241b0fd02474de69bbff20e812de6c75ed8075
+Description: the EGL API and Extension Registry
+Status: install ok installed
+
+Package: opengl-registry
+Version: 2022-09-29
+Port-Version: 1
+Depends: egl-registry
+Architecture: x86-windows
+Multi-Arch: same
+Abi: e4dd3560e13d1ad2ba4cdc4a6208d54aff35793e2662abc5a08585a7231f37e5
+Description: the API and Extension registries for the OpenGL family APIs
+Status: install ok installed
+
+Package: opengl
+Version: 2022-12-04
+Port-Version: 3
+Depends: opengl-registry
+Architecture: x86-windows
+Multi-Arch: same
+Abi: c9b27bba2c37c34455d58dd259c7bee6acefba2274f59c9c1e6fc34e2a5eb19a
+Description: Open Graphics Library (OpenGL)[3][4][5] is a cross-language, cross-platform application programming interface (API) for rendering 2D and 3D vector graphics.
+Status: install ok installed
+

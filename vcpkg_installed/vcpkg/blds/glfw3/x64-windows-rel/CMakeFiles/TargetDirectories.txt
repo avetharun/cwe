@@ -1,0 +1,13 @@
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/blds/glfw3/x64-windows-rel/CMakeFiles/uninstall.dir
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/blds/glfw3/x64-windows-rel/CMakeFiles/edit_cache.dir
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/blds/glfw3/x64-windows-rel/CMakeFiles/rebuild_cache.dir
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/blds/glfw3/x64-windows-rel/CMakeFiles/list_install_components.dir
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/blds/glfw3/x64-windows-rel/CMakeFiles/install.dir
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/blds/glfw3/x64-windows-rel/CMakeFiles/install/local.dir
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/blds/glfw3/x64-windows-rel/src/CMakeFiles/update_mappings.dir
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/blds/glfw3/x64-windows-rel/src/CMakeFiles/glfw.dir
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/blds/glfw3/x64-windows-rel/src/CMakeFiles/edit_cache.dir
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/blds/glfw3/x64-windows-rel/src/CMakeFiles/rebuild_cache.dir
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/blds/glfw3/x64-windows-rel/src/CMakeFiles/list_install_components.dir
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/blds/glfw3/x64-windows-rel/src/CMakeFiles/install.dir
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/blds/glfw3/x64-windows-rel/src/CMakeFiles/install/local.dir

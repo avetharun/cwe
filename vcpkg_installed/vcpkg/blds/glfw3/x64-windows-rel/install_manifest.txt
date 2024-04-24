@@ -1,0 +1,9 @@
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/pkgs/glfw3_x64-windows/lib/glfw3dll.lib
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/pkgs/glfw3_x64-windows/bin/glfw3.dll
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/pkgs/glfw3_x64-windows/include/GLFW/glfw3.h
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/pkgs/glfw3_x64-windows/include/GLFW/glfw3native.h
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/pkgs/glfw3_x64-windows/lib/cmake/glfw3/glfw3Config.cmake
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/pkgs/glfw3_x64-windows/lib/cmake/glfw3/glfw3ConfigVersion.cmake
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/pkgs/glfw3_x64-windows/lib/cmake/glfw3/glfw3Targets.cmake
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/pkgs/glfw3_x64-windows/lib/cmake/glfw3/glfw3Targets-release.cmake
+A:/Projects/cwe-lua/vcpkg_installed/vcpkg/pkgs/glfw3_x64-windows/lib/pkgconfig/glfw3.pc
