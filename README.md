@@ -1,8 +1,8 @@
-﻿# CWE<span style="font-size:50%">(ngine)
+﻿# CWE<sub><sup><i>(ngine)</i></sub></sup>
 
 A 2D game engine built with C++ with Lua bindings with a builtin editor
 
-`<span><img src="docs/license_libre.png" style="width:3%; margin-bottom:-3px">`MIT license
+<span><img src="docs/license_libre.png" style="width:15px; margin-bottom:-1px"> MIT license
 
 <a style="font-size:120%" href="#1-luaref">Lua Reference</a></br>
 <a style="font-size:120%" href="#1-luaexamples">Example Code</a>
