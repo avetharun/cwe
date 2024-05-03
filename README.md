@@ -59,31 +59,31 @@ The project is made with Visual Studio 2022, using VCPKG. Ensure you have these 
 <h3 id="1-events-keyboard">Keyboard Events</h3>
 <p>
 
-- `<code>` on_key_press -> (key:int)`</code>` - Fires when a key is pressed.
-- `<code>` on_key_hold -> (key:int)`</code>` - Fires while a key is held.
-- `<code>` on_key_release -> (key:int)`</code>` - Fires when a key is released.
+- <code> on_key_press -> (key:int)</code> - Fires when a key is pressed.
+- <code> on_key_hold -> (key:int)</code> - Fires while a key is held.
+- <code> on_key_release -> (key:int)</code> - Fires when a key is released.
 
 <h3 id="1-events-mouse">Mouse Events</h3>
 
-- `<code>` on_mouse_click -> (x:int, y:int, left:bool, middle:bool, right:bool)`</code>` - Fires when clicking with a mouse
-- `<code>` on_mouse_move -> (x:int, y:int)`</code>` - Fires when moving the cursor
-- `<code>` on_mouse_scroll -> (amount_scrolled:float)`</code>` - Fires when scrolling
+- <code> on_mouse_click -> (x:int, y:int, left:bool, middle:bool, right:bool)</code> - Fires when clicking with a mouse
+- <code> on_mouse_move -> (x:int, y:int)</code> - Fires when moving the cursor
+- <code> on_mouse_scroll -> (amount_scrolled:float)</code> - Fires when scrolling
 
 <h3 id="1-events-rendering">Rendering Events</h3>
 
-- `<code>` on_render -> ()`</code>` - Fires during the render loop
-- `<code>` on_gui -> ()`</code>` - Fires during the render loop, but after rendering the scene
+- <code> on_render -> ()</code> - Fires during the render loop
+- <code> on_gui -> ()</code> - Fires during the render loop, but after rendering the scene
 
 <h3 id="1-events-game-loop">Game Events</h3>
 
 These are general purpose game loop, or scene events.
 
-- `<code>` on_update → ()`</code>` - Fires during the update loop (every frame)
-- `<code>` on_init → ()`</code>` - Fires when the scene finishes loading assets
-- `<code>` on_save → ()`</code>` - Fires when requested to save
-- `<code>` on_load → (assets:{})`</code>` - Fires when requested to load assets. The assets will be provided in a JSON-like format.
-- `<code>` on_engine_exit → ()`</code>` - Fires before the game finishes exiting (will not occur during any crashes)
-- `<code>` on_engine_init → ()`</code>` - Fires when the game first loads (This event must be defined in the autoexec file)
+- <code> on_update → ()</code> - Fires during the update loop (every frame)
+- <code> on_init → ()</code> - Fires when the scene finishes loading assets
+- <code> on_save → ()</code> - Fires when requested to save
+- <code> on_load → (assets:{})</code> - Fires when requested to load assets. The assets will be provided in a JSON-like format.
+- <code> on_engine_exit → ()</code> - Fires before the game finishes exiting (will not occur during any crashes)
+- <code> on_engine_init → ()</code> - Fires when the game first loads (This event must be defined in the autoexec file)
 
 </p>
 
