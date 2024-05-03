@@ -3,13 +3,13 @@
   "spdxVersion": "SPDX-2.2",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
-  "documentNamespace": "https://spdx.org/spdxdocs/lua-x64-windows-static-md-5.4.6-03f70c4e-34e0-46ac-a4c8-11989b451dde",
-  "name": "lua:x64-windows-static-md@5.4.6 f08f087c35adbe294f06716278ab1869a45aec936686559f646fbc2e02b485cc",
+  "documentNamespace": "https://spdx.org/spdxdocs/lua-x64-windows-static-md-5.4.6-83569761-1837-4090-96f4-8851f2947e70",
+  "name": "lua:x64-windows-static-md@5.4.6 3c17bc86f3eb93b79f013e9c48fcfa64b6bae6dac4b6b6854af45dbf450bd633",
   "creationInfo": {
     "creators": [
       "Tool: vcpkg-7d353e869753e5609a1f1a057df3db8fd356e49d"
     ],
-    "created": "2024-04-23T21:30:03Z"
+    "created": "2024-04-30T23:29:48Z"
   },
   "relationships": [
     {
@@ -129,7 +129,7 @@
     {
       "name": "lua:x64-windows-static-md",
       "SPDXID": "SPDXRef-binary",
-      "versionInfo": "f08f087c35adbe294f06716278ab1869a45aec936686559f646fbc2e02b485cc",
+      "versionInfo": "3c17bc86f3eb93b79f013e9c48fcfa64b6bae6dac4b6b6854af45dbf450bd633",
       "downloadLocation": "NONE",
       "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "NOASSERTION",

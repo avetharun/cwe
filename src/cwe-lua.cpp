@@ -1,17 +1,34 @@
+/*****************************************************************//**
+ * \paragraph CWE: 2D game engine built upon ImGui and GLFW
+ * 
+ * 
+ * \author Feintha
+ * \date   April 2024
+ *********************************************************************/
 
 
+#include <lua.h>
+#include "engine/binparse.h"
 #include <iostream>
 #include <GL/glfw3.h>
 #include <bit>
 #include "imgui/imgui.h"
+#include "imgui/imgui_uielement.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 #include <stdio.h>
 #include <nlohmann/json/json.hpp>
 #include "argparse.hpp"
 #include "utilities.h"
+#include <alib.h>
+#include "engine/sysinput.h"
+
+
+auto f = std::function<void(unsigned char)>([&](unsigned char) {
+	printf("abc\n");
+});
 static void glfw_error_callback(int error, const char* description) {
-	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+	fprintf(stderr, "CW: GLFW Error %d: %s\n", error, description);
 	ShowConsole();
 }
 #ifndef NDEBUG
@@ -24,6 +41,8 @@ static void glfw_error_callback(int error, const char* description) {
 #ifndef DEBUG
 #define DEBUG !NDEBUG
 #endif
+
+void impl_lua();
 
 
 static GameAppConfig CONFIG;
@@ -40,32 +59,77 @@ void setConsoleState(bool state) {
 		HideConsole();
 	}
 }
+GLFWwindow* window;
+GLFWwindow* getWindow()
+{
+	return window;
+}
+void test(char) { printf("tested\n"); };
 // When margin = true and window width or height are differnt than their default, we need to 
 bool isWindowSizeRedone = false;
 bool showsConsole = false;
 int main(int argc, char** argv) {
-
-	if constexpr (std::endian::native == std::endian::big)
-		std::cout << "big-endian\n";
-	else if constexpr (std::endian::native == std::endian::little)
-		std::cout << "little-endian\n";
-	else
-		std::cout << "mixed-endian\n";
-	printf("Starting cwe. Big endian? %d\n", is_big_endian());
+	getEngineTimeHolders().timeSinceStart->start();
 	parser.add_description("If window is resizable, any area outside of the specified width, height will be black. This can be disabled with the --margin argument");
-	parser.add_argument("--window_width", "-w").default_value(512).help("Specifies the window's default width.").store_into(CONFIG.windowWidth);
-	parser.add_argument("--window_height", "-h").default_value(512).help("Specifies the window's default height.").store_into(CONFIG.windowHeight);
+	parser.add_argument("--window_width", "-w").nargs(1, 1).default_value(512).help("Specifies the window's default width. This applies to any borders that may be drawn from resizing.").store_into(CONFIG.windowWidth);
+	parser.add_argument("--window_height", "-h").nargs(1, 1).default_value(512).help("Specifies the window's default height. This applies to any borders that may be drawn from resizing.").store_into(CONFIG.windowHeight);
 	auto& resizing_group = parser.add_mutually_exclusive_group();
 	resizing_group.add_argument("--borderless", "-b").default_value(false).implicit_value(true).help("Specifies if the window should be borderless").store_into(CONFIG.isBorderless);
 	resizing_group.add_argument("--resizable", "-q").default_value(true).implicit_value(true).help("Specifies if the window should be resizable").store_into(CONFIG.isResizable);
-	parser.add_argument("--use_vsync", "-z").default_value(true).implicit_value(true).help("Specifies if the game should use VSync").store_into(CONFIG.useVsync);
 	parser.add_argument("--window_name", "-t").default_value("Game").help("Specifies the title of the window").store_into(CONFIG.windowName);
 	parser.add_argument("--verbose", "-v").default_value(true).implicit_value(true).help("Specifies whether to print debug messages to the console").store_into(CONFIG.isVerbose);
 	parser.add_argument("--console").default_value(true).implicit_value(true).help("Shows or hides the console").store_into(showsConsole);
-	parser.add_argument("--margin").default_value(true).implicit_value(true).help("Specifies whether to black out edges of the screen when a predefined window size is set and window is resizable"
+	parser.add_group("Rendering").add_argument("--margin").default_value(true).implicit_value(true).help("Specifies whether to black out edges of the screen when a predefined window size is set and window is resizable"
 						).store_into(CONFIG.enableMargin);
+	parser.add_argument("--use_vsync", "-z").default_value(true).implicit_value(true).help("Specifies if the game should use VSync").store_into(CONFIG.useVsync);
+
+
+	bool isGameDefinedByArgs = false;
+	parser.add_group("Single-file game loading").add_argument("--autoload").default_value("").help("Path to the autoload file. File can either be a .cw[a,l,t] or a lua script.").nargs(1, 1);
+	parser.add_argument("--saved_data").default_value("").help("Path to the saved data path. Writing out gamedata from runtime will write here.").store_into(CONFIG.binary_appconfig.saved_data_path).nargs(1, 1);
+	bool testParser = false;
+#if NDEBUG
+	parser.add_argument("--test_parsing").default_value(false).implicit_value(true).hidden().store_into(testParser);
+#endif
+	std::string gameloader;
+	parser.add_group("Loader can be of .cw[a,l,t]. Lua scripts are not supported.").add_argument("--loader").default_value("assets/main.cwt").store_into(gameloader).help("Main loader file for the game. If the --autoload param is present, this will do nothing.").nargs(1, 1);
+	EngineTimer t1;
+	t1.start();
+	if (!alib_file_exists(gameloader.c_str()) &&!CONFIG.binary_appconfig.autoload_path.empty() && !parser.is_used("--autoload")) {
+		printf("Failed to initialize game, loader \"%s\" doesn't exist!\n", gameloader.c_str());
+	} else if (!parser.is_used("--autoload") && alib_file_exists(gameloader.c_str())){
+		CONFIG.appconfig = nlohmann::json::parse(alib_file_read(gameloader.c_str()));
+		std::string autoload = CONFIG.appconfig["autoload"].get<std::string>();
+		CONFIG.binary_appconfig.autoload_path= CONFIG.appconfig["autoload"];
+		if (CONFIG.appconfig.contains("saved_data")) {
+			CONFIG.binary_appconfig.saved_data_path = CONFIG.appconfig["saved_data"];
+		}
+	}
+	else if (!alib_file_exists(gameloader.c_str())) {
+		if (!parser.is_used("--autoload")) {
+			// Load debug scene (aka editor)
+		} else printf("Failed to initialize game, loader \"%s\" doesn't exist!\n", gameloader.c_str());
+	}
 	parser.parse_args(argc, argv);
 	printlnf_if_verbose("Parsed arguments.\nInitializing...");
+
+	if (testParser) {
+		printlnf_if_verbose("Testing binparse impl...");
+		cw::BinarySerializer::Writer w;
+		int chkInt = 37112 ^ time(NULL);
+		char chkChr = 182 ^ time(NULL);
+		w.write_uint(chkInt);
+		w.write_ubyte(chkChr);
+		std::string s = "\"TEST\"";
+		w.write_string(s);
+		unsigned long long chkLng = -327132434 ^ time(NULL);
+		w.write_ulong(chkLng);
+		cw::BinarySerializer::Reader r = w.to_reader();
+		printf("\nunsigned int: Found %u, expected %u\n", r.read_uint(), chkInt);
+		printf("unsigned byte: Found %hhu, expected %hhu\n", r.read_ubyte(), chkChr);
+		printf("string: Found %s, expected %s\n", r.read_string().c_str(), s.c_str());
+		printf("unsigned long: Found %llu, expected %llu\n", r.read_ulong(), chkLng);
+	}
 	glfwSetErrorCallback(glfw_error_callback);
 	setConsoleState(showsConsole);
 	if (!glfwInit()) {
@@ -98,25 +162,36 @@ int main(int argc, char** argv) {
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
 
-	//glfwWindowHint(GLFW_RESIZABLE, CONFIG.isResizable);
+	glfwWindowHint(GLFW_RESIZABLE, CONFIG.isResizable);
 	glfwWindowHint(GLFW_DECORATED, !CONFIG.isBorderless);
+
 	// Create window with graphics context
-	GLFWwindow* window = glfwCreateWindow(CONFIG.windowWidth, CONFIG.windowHeight, CONFIG.windowName.c_str(), nullptr, nullptr);
+	window = glfwCreateWindow(CONFIG.windowWidth, CONFIG.windowHeight, CONFIG.windowName.c_str(), nullptr, nullptr);
 	if (window == nullptr) {
 		printlnf_if_verbose("Failed to create GLFW window");
 		return 1;
 	}
+
+	glfwSetKeyCallback(window, key_callback);
+	glfwSetCursorPosCallback(window, cursor_position_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
+	glfwSetScrollCallback(window, scroll_callback);
+
+
+	glfwSetWindowSizeLimits(window, CONFIG.windowWidth, CONFIG.windowHeight, GLFW_DONT_CARE, GLFW_DONT_CARE);
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(CONFIG.useVsync); // Enable vsync
 
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	
+	impl_lua();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_IsSRGB;     // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 	printf_if_verbose("Created ImGui context");
+	t1.end();
+	printlnf_if_verbose("Engine took %f milliseconds to start", t1.millis());
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
@@ -132,29 +207,13 @@ int main(int argc, char** argv) {
 	ImGui_ImplOpenGL3_Init(glsl_version);
 	printlnf_if_verbose("Initialized ImGui for %s", isEmscriptenUsed ? "Emscripten, GLFW, and OpenGL3" : "GLFW and OpenGL3");
 
-	// Load Fonts
-	// - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-	// - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-	// - If the file cannot be loaded, the function will return a nullptr. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-	// - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-	// - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
-	// - Read 'docs/FONTS.md' for more instructions and details.
-	// - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-	// - Our Emscripten build process allows embedding fonts to be accessible at runtime from the "fonts/" folder. See Makefile.emscripten for details.
-	//io.Fonts->AddFontDefault();
-	//io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
-	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-	//ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
-	//IM_ASSERT(font != nullptr);
-
 	// Our state
 	bool show_demo_window = true;
 	bool show_another_window = false;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
+	EngineTimer t2;
 	// Main loop
+	printf("%zd", cw::InputManagement::Keyboard::getOnKeyPress().size());
 #ifdef __EMSCRIPTEN__
 	// For an Emscripten build we are disabling file-system access, so let's not attempt to do a fopen() of the imgui.ini file.
 	// You may manually call LoadIniSettingsFromMemory() to load settings from your own storage.
@@ -164,89 +223,50 @@ int main(int argc, char** argv) {
 	while (!glfwWindowShouldClose(window))
 #endif
 	{
+		t2.start();
 		// Poll and handle events (inputs, window resize, etc.)
 		// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
 		// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
 		// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
 		// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
 		glfwPollEvents();
+		cw::lua::invokeEventsFor("on_update");
 
 		// Start the Dear ImGui frame
+		cw::lua::invokeEventsFor("on_gui");
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-
-		// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-		ImGui::ShowDemoWindow();
-		// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
-		{
-			static float f = 0.0f;
-			static int counter = 0;
-
-			ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-			ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-			ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-			ImGui::Checkbox("Another Window", &show_another_window);
-
-			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-			ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-			if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-				counter++;
-			ImGui::SameLine();
-			ImGui::Text("counter = %d", counter);
-			ImGui::ColorButton("TEST", ImGui::ColorConvertU32ToFloat4(0x000000ff));
-			
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-			ImGui::End();
-		}
-
-		// 3. Show another simple window.
-		if (show_another_window)
-		{
-			ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-			ImGui::Text("Hello from another window!");
-			if (ImGui::Button("Close Me"))
-				show_another_window = false;
-			ImGui::End();
-		}
-
-		//if (CONFIG.enableMargin) {
-			int imDisplayW = io.DisplaySize.x;
-			int imDisplayH = io.DisplaySize.y;
-			float imDisplayWF = io.DisplaySize.x;
-			float imDisplayHF = io.DisplaySize.y;
-			if (imDisplayW != CONFIG.windowWidth) {
-				//printlnf_if_verbose("Width of window is different! Expected %d, found %d", CONFIG.windowWidth, imDisplayW);
-				int diff = imDisplayW - CONFIG.windowWidth;
-				float halfDiff = diff / 2;
-				// What should happen: a fully black rect
-				// What actually happens: nothing displays (except when I add a slight amount of color (0c)
-				// (0xAABBGGRR)
-				ImGui::GetForegroundDrawList()->AddRectFilled({ 0,0 }, { halfDiff,imDisplayHF }, 0x0c0000ff, 0);
-				// However, the following creates a black rect:
-				// (0xAABBGGRR)
-				ImGui::GetForegroundDrawList()->AddRectFilled({ imDisplayWF - halfDiff,0 }, { imDisplayWF,imDisplayHF }, 0xff000000, 0);
-			}
-			if (imDisplayH != CONFIG.windowHeight) {
-				//printlnf_if_verbose("Height of window is different! Expected %d, found %d", CONFIG.windowHeight, imDisplayH);
-			}
-		//}
+		cw::lua::invokeEventsFor("on_render");
+		// Internally, we use ImGui to render everything!
 		// Rendering
+
+
+
+		cw::lua::invokeEventsFor("_util_before_imgui_render_frame");
 		ImGui::Render();
 		int display_w, display_h;
 		glfwGetFramebufferSize(window, &display_w, &display_h);
 		glViewport(0, 0, display_w, display_h);
 		glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
 		glClear(GL_COLOR_BUFFER_BIT);
+		cw::lua::invokeEventsFor("_util_after_clear_color");
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		cw::lua::invokeEventsFor("on_pre_swap");
 		glfwSwapBuffers(window);
+		cw::lua::invokeEventsFor("on_before_input_updated");
+		cw::InputManagement::Keyboard::update();
+#ifdef WIN32
+		Sleep(0);
+#endif
+		t2.end();
+		*getEngineTimeHolders().deltaTimer = t2;
 	}
 #ifdef __EMSCRIPTEN__
 	EMSCRIPTEN_MAINLOOP_END;
 #endif
 
+	cw::lua::invokeEventsFor("on_exit");
 	// Cleanup
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();

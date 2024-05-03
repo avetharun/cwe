@@ -1,0 +1,7 @@
+Package: luabridge
+Version: 2.8
+Architecture: x64-windows-static
+Multi-Arch: same
+Abi: f0ea2a57eb90ea460fc63cd003e5deb7d02d03441f1d84df4a0244f6694cdd8f
+Description: A lightweight, dependency-free library for binding Lua to C++
+Status: install ok half-installed

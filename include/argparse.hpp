@@ -2445,12 +2445,15 @@ namespace argparse {
 							it = argument->consume(it, end, arg_map_it2->first);
 						}
 						else {
-							throw std::runtime_error("Unknown argument: " + current_argument);
+							//throw std::runtime_error("Unknown argument: " + current_argument);
+							it++;
 						}
 					}
 				}
 				else {
-					throw std::runtime_error("Unknown argument: " + current_argument);
+					//throw std::runtime_error("Unknown argument: " + current_argument); // WHY IS THIS A THING????
+
+					it++;
 				}
 			}
 			m_is_parsed = true;

@@ -51,3 +51,12 @@ Abi: 3953185e9d6cc42d983c2f144cdc4370cc11c3e183df0df614e8ad23c0afff2f
 Description: Open Graphics Library (OpenGL)[3][4][5] is a cross-language, cross-platform application programming interface (API) for rendering 2D and 3D vector graphics.
 Status: install ok installed
 
+Package: lua
+Version: 5.4.6
+Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
+Architecture: x64-windows-static-md
+Multi-Arch: same
+Abi: f08f087c35adbe294f06716278ab1869a45aec936686559f646fbc2e02b485cc
+Description: A powerful, fast, lightweight, embeddable scripting language
+Status: install ok installed
+

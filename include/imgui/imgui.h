@@ -2548,6 +2548,7 @@ IM_MSVC_RUNTIME_CHECKS_RESTORE
 #endif
 #endif
 #define IM_COL32(R,G,B,A)    (((ImU32)(A)<<IM_COL32_A_SHIFT) | ((ImU32)(B)<<IM_COL32_B_SHIFT) | ((ImU32)(G)<<IM_COL32_G_SHIFT) | ((ImU32)(R)<<IM_COL32_R_SHIFT))
+#define IM_HXCOL(col) (((col & 0xFF000000) >> 24) | ((col & 0x00FF0000) >> 8) | ((col & 0x0000FF00) << 8) | ((col & 0x000000FF) << 24))
 #define IM_COL32_WHITE       IM_COL32(255,255,255,255)  // Opaque white = 0xFFFFFFFF
 #define IM_COL32_BLACK       IM_COL32(0,0,0,255)        // Opaque black
 #define IM_COL32_BLACK_TRANS IM_COL32(0,0,0,0)          // Transparent black = 0x00000000
